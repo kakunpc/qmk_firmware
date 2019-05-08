@@ -29,7 +29,7 @@ enum custom_keycodes {
 //R4:6 + 8 = 14
 //R5:6 + 6 = 12
 //total : 69 keys
-//
+
 enum layers{
 	DF,
 	LW,
@@ -82,10 +82,7 @@ void led_set_user(uint8_t usb_led) {
 }
 
 void keyboard_post_init_user(void) {
-  // Call the post init code.
-  rgblight_enable_noeeprom(); // enables Rgb, without saving settings
-  rgblight_sethsv_blue(); // sets the color to teal/cyan without saving
-  // 6yrgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3); // sets mode to Fast breathing without saving
+  rgblight_enable_noeeprom();
 }
 
 /*
