@@ -15,11 +15,23 @@
  */
 #pragma once
 
-#ifdef KEYBOARD_business_card_alpha
-    #include "alpha.h"
-#endif
-#ifdef KEYBOARD_business_card_beta
-    #include "beta.h"
-#endif
-
 #include "quantum.h"
+
+/* This a shortcut to help you visually see your layout.
+ *
+ * The first section contains all of the arguments representing the physical
+ * layout of the board and position of the keys.
+ *
+ * The second converts the arguments into a two-dimensional array which
+ * represents the switch matrix.
+ */
+#define LAYOUT( \
+    k00, k01,  \
+    k10, k11,  \
+    k20, k21   \
+) \
+{ \
+    { k21, k20 }, \
+    { k11, k10 }, \
+    { k01, k00 }, \
+}

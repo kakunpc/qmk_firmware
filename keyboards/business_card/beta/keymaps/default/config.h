@@ -13,13 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
-#ifdef KEYBOARD_business_card_alpha
-    #include "alpha.h"
-#endif
-#ifdef KEYBOARD_business_card_beta
-    #include "beta.h"
-#endif
-
-#include "quantum.h"
+// place overrides here
+#define USE_I2C
+#define SSD1306OLED
