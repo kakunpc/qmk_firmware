@@ -4,7 +4,7 @@
 
 A short description of the keyboard/project
 
-Keyboard Maintainer: [kakunoc](https://github.com/kakunpc)  
+Keyboard Maintainer: [kakunpc](https://github.com/kakunpc)  
 Hardware Supported: The PCBs, controllers supported  
 Hardware Availability: links to where you can find this hardware
 
