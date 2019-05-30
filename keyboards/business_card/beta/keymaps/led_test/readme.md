@@ -1,1 +1,1 @@
-# The default keymap for business_card
+# The ledtest keymap for business_card

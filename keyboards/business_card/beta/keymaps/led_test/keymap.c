@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "lufa.h"
-#include "ssd1306.h"
+#include "oled_driver.h"
 #include "rgblight_list.h"
 
 typedef struct {
@@ -66,11 +66,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_init_user(void) {
-  iota_gfx_init(false);
-  //debug_enable = true;
   eeconfig_update_rgblight_default();
   rgblight_enable();
-  rgblight_sethsv_white();
   rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
 }
 
@@ -112,29 +109,24 @@ void MainLoop(void) {
 }
 
 void matrix_scan_user(void) {
-  iota_gfx_task();
   MainLoop();
 }
 
-void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
-  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-    memcpy(dest->display, source->display, sizeof(dest->display));
-    dest->dirty = true;
-  }
-}
-
-void iota_gfx_task_user(void) {
-  struct CharacterMatrix matrix;
-  matrix_clear(&matrix);
-   char s1[100];
-   int index = ToIndex(touchData.touchPos);
-   sprintf(s1, "IsActive:%s\nCol:%d Row:%d\nTime:%d\nIndex:%d",
-    touchData.isActive?"True":"False",
-     touchData.touchPos.Col, touchData.touchPos.Row,
-      touchData.time,
-       index);
-   matrix_write(&matrix, s1);
-  matrix_update(&display, &matrix);
+void oled_task_user(void) {
+  char s1[25];
+  int index = ToIndex(touchData.touchPos);
+  sprintf(s1, "IsActive:%s\n", touchData.isActive?"True":"False");   
+  oled_write(s1, false);
+  memset(s1, 0, sizeof(s1));
+  sprintf(s1, "Col:%d Row:%d\n", touchData.touchPos.Col, touchData.touchPos.Row);
+  oled_write(s1, false);
+  memset(s1, 0, sizeof(s1));
+  sprintf(s1, "Time:%d\n", touchData.time);
+  oled_write(s1, false);
+  memset(s1, 0, sizeof(s1));
+  sprintf(s1, "Index:%d", index);
+  oled_write(s1, false);
+  memset(s1, 0, sizeof(s1));
 }
 
 void led_set_user(uint8_t usb_led) {}

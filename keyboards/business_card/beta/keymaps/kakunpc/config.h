@@ -17,7 +17,3 @@
 #pragma once
 
 // place overrides here
-
-#ifdef RGB_DI_PIN
-   #define RGBLIGHT_ANIMATIONS
-#endif
