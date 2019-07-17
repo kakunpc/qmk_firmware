@@ -11,4 +11,7 @@
 #define IS_LEFT_HAND  true
 #define ENABLE_STARTUP_ADV_NOLIST
 
+#define BLE_NUS_MIN_INTERVAL 8.5
+#define BLE_NUS_MAX_INTERVAL 8.5
+
 #endif /* MASTER_CONFIG_H_ */
