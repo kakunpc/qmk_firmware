@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include "app_ble_func.h"
 
+#ifdef RGBLIGHT_ENABLE
+//Following line allows macro to read current RGB settings
+extern rgblight_config_t rgblight_config;
+#endif
+
 enum custom_keycodes {
     AD_WO_L = SAFE_RANGE, /* Start advertising without whitelist  */
     BLE_DIS,              /* Disable BLE HID sending              */
@@ -38,10 +43,12 @@ enum custom_keycodes {
     DEL_ID4,              /* Delete bonding of PeerID 4           */
     ENT_DFU,              /* Start bootloader                     */
     ENT_SLP,              /* Deep sleep mode                      */
+    RGBRST,
 };
 
 
 extern keymap_config_t keymap_config;
+int RGB_current_mode;
 
 // Fillers to make layering more clear
 #define _______ KC_TRNS
@@ -58,6 +65,15 @@ enum layers{
 
 #define KC_COMMAND    LT(COMMAND, KC_MHEN)
 #define KC_SETTING    LT(SETTING, KC_MHEN)
+#define KC_LTOG  RGB_TOG
+#define KC_LHUI  RGB_HUI
+#define KC_LHUD  RGB_HUD
+#define KC_LSAI  RGB_SAI
+#define KC_LSAD  RGB_SAD
+#define KC_LVAI  RGB_VAI
+#define KC_LVAD  RGB_VAD
+#define KC_LSMOD RGB_SMOD
+#define KC_LMOD  RGB_MOD
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [BASE] = LAYOUT(\
@@ -78,8 +94,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     AD_WO_L, ADV_ID0,  ADV_ID1,  ADV_ID2, ADV_ID3, ADV_ID4, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, DELBNDS , \
          KC_NO, DEL_ID0, DEL_ID1, DEL_ID2, DEL_ID3, DEL_ID4, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, \
     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, \
-    KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, \
-    KC_NO, KC_NO, KC_NO, _______, BATT_LV,    _______,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO \
+    KC_NO,  KC_LVAD,  KC_LVAI,  KC_LHUD,  KC_LHUI,  KC_LSAD,  KC_LSAI, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, \
+    KC_NO, KC_LMOD, RGBRST, _______, BATT_LV,    _______,   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO \
   ),
 };
 
@@ -143,6 +159,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case ENT_DFU:
       bootloader_jump();
       return false;
+//#ifdef RGBLIGHT_ENABLE
+    case RGB_MOD:
+        if (record->event.pressed) {
+          rgblight_mode(RGB_current_mode);
+          rgblight_step();
+          RGB_current_mode = rgblight_config.mode;
+        }
+      return false;
+    case RGBRST:
+        if (record->event.pressed) {
+          eeconfig_update_rgblight_default();
+          rgblight_enable();
+          RGB_current_mode = rgblight_config.mode;
+        }
+      return false;
+//#endif
     }
   }
   else if (!record->event.pressed) {
@@ -157,8 +189,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 ;
 
-/*
+
 void matrix_init_user(void){
-  set_usb_enabled(true);
+#ifdef RGBLIGHT_ENABLE
+
+#endif
 }
-*/
+
