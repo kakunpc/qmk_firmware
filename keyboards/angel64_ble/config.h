@@ -56,7 +56,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RGBLIGHT_ANIMATIONS
 #define RGB_DI_PIN GPIO(0,8)     // The pin the LED strip is connected to
-#define RGBLED_NUM 8     // Number of LEDs in your strip
+#define RGBLED_NUM 64     // Number of LEDs in your strip
+#define RGBLIGHT_HUE_STEP 8
+#define RGBLIGHT_SAT_STEP 8
+#define RGBLIGHT_VAL_STEP 8
+#define RGBLIGHT_LIMIT_VAL 25 /* The maximum brightness level */
 
 /*
  * Feature disable options
