@@ -17,4 +17,3 @@
 #pragma once
 
 // place overrides here
-#define OLED_FONT_H "glcdfont.c"

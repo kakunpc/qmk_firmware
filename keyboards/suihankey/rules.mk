@@ -58,6 +58,10 @@ BOOTLOADER = atmel-dfu
 # OPT_DEFS += -DBOOTLOADER_SIZE=4096
 
 
+# Custom local font file
+OPT_DEFS += -DOLED_FONT_H=\"common/glcdfont.c\"
+
+
 # Build Options
 #   change yes to no to disable
 #
