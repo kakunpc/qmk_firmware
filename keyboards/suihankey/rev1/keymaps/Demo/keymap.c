@@ -15,6 +15,10 @@
  */
 #include QMK_KEYBOARD_H
 
+#include <stdio.h>
+#include <math.h>
+
+
 enum layers{
     BASE,
     SKILL_1,
@@ -24,7 +28,25 @@ enum layers{
 };
 
 enum my_keycodes {
-  LOGO_TOG = SAFE_RANGE
+  LOGO_TOG = SAFE_RANGE,
+  SK_1_1,
+  SK_1_2,
+  SK_1_3,
+  SK_1_4,
+  SK_1_5,
+  SK_1_6,
+  SK_2_1,
+  SK_2_2,
+  SK_2_3,
+  SK_2_4,
+  SK_2_5,
+  SK_2_6,
+  SK_3_1,
+  SK_3_2,
+  SK_3_3,
+  SK_3_4,
+  SK_3_5,
+  SK_3_6,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -35,21 +57,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
              MO(SKILL_3), MO(SKILL_2), MO(SKILL_1)),
 
 	[SKILL_1] = LAYOUT(
-        KC_1, KC_Q, KC_W, KC_E, KC_4,
-        KC_2, KC_A, KC_S, KC_D, KC_5,
-        KC_3, KC_7, KC_8, KC_9, KC_6,
+        KC_NO, SK_1_1, SK_1_2, SK_1_3, KC_NO,
+        KC_NO, SK_1_4, SK_1_5, SK_1_6, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
               KC_NO, KC_NO, KC_TRNS),
 
 	[SKILL_2] = LAYOUT(
-        KC_F1, KC_Q, KC_W, KC_E, KC_F4,
-        KC_F2, KC_A, KC_S, KC_D, KC_F5,
-        KC_F3, KC_F7, KC_F8, KC_F9, KC_F6,
+        KC_NO, SK_2_1, SK_2_2, SK_2_3, KC_NO,
+        KC_NO, SK_2_4, SK_2_5, SK_2_6, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
                     KC_NO, KC_TRNS, KC_NO),
 
 	[SKILL_3] = LAYOUT(
-        LCTL(KC_1), KC_Q, KC_W, KC_E, LCTL(KC_4),
-        LCTL(KC_2), KC_A, KC_S, KC_D, LCTL(KC_5),
-        LCTL(KC_3), LCTL(KC_7), LCTL(KC_8), LCTL(KC_9), LCTL(KC_6),
+        KC_NO, SK_3_1, SK_3_2, SK_3_3, KC_NO,
+        KC_NO, SK_3_4, SK_3_5, SK_3_6, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
                                             KC_TRNS, KC_NO, KC_NO),
 	[SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
@@ -59,6 +81,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool useLogo = false;
+uint16_t code;
+int logoLimit = 1000;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -68,21 +92,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-        case KC_Q:
-
-        break;
-
         default:
+            if (record->event.pressed &&
+                keycode != KC_NO &&
+                keycode != KC_TRNS &&
+                keycode != MO(SKILL_1) &&
+                keycode != MO(SKILL_2) &&
+                keycode != MO(SKILL_3)) {
+                code = keycode;
+            }else if(code == keycode) {
+                code = 0;
+            }
             return true;
     }
 }
 
 void matrix_init_user(void) {
-
+    rgblight_mode_noeeprom(RGBLIGHT_MODE_RAINBOW_SWIRL + 5);
 }
 
 void matrix_scan_user(void) {
-
+    if(logoLimit > 0)
+    {
+        --logoLimit;
+    }
 }
 
 void led_set_user(uint8_t usb_led) {
@@ -98,12 +131,108 @@ static void render_logo(void) {
   oled_write_P(qmk_logo, false);
 }
 
+char* KeycodeToChar(uint16_t keycode) {
+    switch (keycode) {
+        case KC_Q:
+            return "Q";
+        case KC_W:
+            return "W";
+        case KC_E:
+            return "E";
+        case KC_R:
+            return "R";
+        case KC_TAB:
+            return "TAB";
+        case KC_A:
+            return "A";
+        case KC_S:
+            return "S";
+        case KC_D:
+            return "D";
+        case KC_F:
+            return "F";
+        case KC_LSFT:
+            return "SHIFT";
+        case KC_Z:
+            return "Z";
+        case KC_X:
+            return "X";
+        case KC_C:
+            return "C";
+        case KC_V:
+            return "V";
+        case LT(SETTING, KC_ESC):
+            return "ESC";
+        case KC_TRNS:
+        case KC_NO:
+            return "";
+        case SK_1_1:
+            return "Fire";
+        case SK_1_2:
+            return "Ice Storm";
+        case SK_1_3:
+            return "Diamond Cute";
+        case SK_1_4:
+            return "Braindamd";
+        case SK_1_5:
+            return "Jugemu";
+        case SK_1_6:
+            return "Payoen";
+        case SK_2_1:
+            return "Accelerator";
+        case SK_2_2:
+            return "Flame";
+        case SK_2_3:
+            return "Cycloir";
+        case SK_2_4:
+            return "Actina";
+        case SK_2_5:
+            return "Fairy Fair";
+        case SK_2_6:
+            return "Payoen";
+        case SK_3_1:
+            return "Solved";
+        case SK_3_2:
+            return "Sign";
+        case SK_3_3:
+            return "Cosine";
+        case SK_3_4:
+            return "Tangent";
+        case SK_3_5:
+            return "Integral";
+        case SK_3_6:
+            return "Permeation";
+        default:
+            return "?";
+    }
+}
+
+uint32_t layer_state_set_user(uint32_t state) {
+    switch (biton32(state)) {
+    default:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_RAINBOW_SWIRL + 5);
+        break;
+    case SKILL_1:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3);
+        rgblight_sethsv_noeeprom(HSV_RED);
+        break;
+    case SKILL_2:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3);
+        rgblight_sethsv_noeeprom(HSV_BLUE);
+        break;
+    case SKILL_3:
+        rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3);
+        rgblight_sethsv_noeeprom(HSV_GREEN);
+        break;
+    }
+  return state;
+}
+
 void oled_task_user(void) {
-    if (useLogo) {
+    if (useLogo || logoLimit > 0) {
         render_logo();
         return;
     }
-
     oled_write_P(PSTR("Layer: "), false);
     switch (biton32(layer_state)) {
         case BASE:
@@ -129,5 +258,8 @@ void oled_task_user(void) {
     oled_write_P(IS_HOST_LED_ON(USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);
     oled_write_P(IS_HOST_LED_ON(USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);
     oled_write_P(IS_HOST_LED_ON(USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);
+    char s1[25];
+    sprintf(s1, "Last: %s", KeycodeToChar(code));
+    oled_write(s1, false);
     oled_write_P(PSTR("\n              "), false);
 }
