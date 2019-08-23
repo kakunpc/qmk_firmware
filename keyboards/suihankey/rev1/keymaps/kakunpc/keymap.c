@@ -20,7 +20,9 @@ enum layers{
     SKILL_1,
     SKILL_2,
     SKILL_3,
-    SETTING
+    SETTING,
+    SATISFACTORY,
+    SATISFACTORY_SETTING,
 };
 
 enum my_keycodes {
@@ -54,7 +56,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, LOGO_TOG,
+        DF(SATISFACTORY), KC_NO, KC_NO, KC_NO, LOGO_TOG,
+              RGB_MOD, RGB_RMOD, RGB_TOG),
+	[SATISFACTORY] = LAYOUT(
+        LT(SATISFACTORY_SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_R,
+        KC_TAB, KC_A, KC_S, KC_D, KC_F,
+        KC_LSFT,   KC_Z, KC_X, KC_C, KC_V,
+                  KC_T, KC_SPC, KC_SPC),
+	[SATISFACTORY_SETTING] = LAYOUT(
+        KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
+        KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
+        DF(BASE), KC_NO, KC_NO, KC_NO, LOGO_TOG,
               RGB_MOD, RGB_RMOD, RGB_TOG),
 };
 
@@ -116,6 +128,12 @@ void oled_task_user(void) {
             break;
         case SETTING:
             oled_write_P(PSTR("SETTING\n"), false);
+            break;
+        case SATISFACTORY:
+            oled_write_P(PSTR("SATISFACTORY\n"), false);
+            break;
+        case SATISFACTORY_SETTING:
+            oled_write_P(PSTR("SATIS_SETTING\n"), false);
             break;
         default:
             oled_write_ln_P(PSTR("Undefined\n"), false);
