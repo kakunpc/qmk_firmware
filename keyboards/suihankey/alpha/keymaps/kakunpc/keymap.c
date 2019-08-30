@@ -75,8 +75,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[TOHOU] = LAYOUT(
         LT(TOHOU_SETTING,KC_ESC), KC_NO, KC_UP, KC_NO, KC_NO,
         KC_LSFT, KC_LEFT, KC_DOWN, KC_RIGHT, KC_NO,
-        KC_LSFT,   KC_NO, KC_NO, KC_NO, KC_NO,
-                  KC_C, KC_X, KC_Z),
+        KC_Z,   KC_NO, KC_NO, KC_NO, KC_NO,
+                  KC_C, KC_X, KC_LSFT ),
 	[TOHOU_SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
