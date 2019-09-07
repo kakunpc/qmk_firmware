@@ -20,6 +20,7 @@ enum layers{
     SKILL_1,
     SKILL_2,
     SKILL_3,
+    UTILITY,
     SETTING,
     SATISFACTORY,
     SATISFACTORY_SETTING,
@@ -33,28 +34,35 @@ enum my_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[BASE] = LAYOUT(
+        KC_1, KC_2, KC_3, KC_4, KC_5,
+        KC_MINUS, KC_Q, KC_W, KC_E, KC_QUOTE,
+        KC_NO, KC_A, KC_S, KC_D, LT(UTILITY,KC_SPC),
+        LT(SKILL_3,KC_SPC), LT(SKILL_2,KC_SPC), LT(SKILL_1,KC_SPC)),
+
+	[SKILL_1] = LAYOUT(
+        KC_F1, KC_F2, KC_F3, KC_F4, KC_F5,
+        KC_F11, KC_Q, KC_W, KC_E, KC_F12,
+        KC_NO, KC_A, KC_S, KC_D, KC_NO,
+              KC_NO, KC_NO, KC_NO),
+
+	[SKILL_2] = LAYOUT(
+        LCTL(KC_1), LCTL(KC_2), LCTL(KC_3), LCTL(KC_4), LCTL(KC_5),
+        LCTL(KC_MINUS), KC_Q, KC_W, KC_E, LCTL(KC_QUOTE),
+        KC_NO, KC_A, KC_S, KC_D, KC_NO,
+                    KC_NO, KC_NO, KC_NO),
+
+	[SKILL_3] = LAYOUT(
+        KC_6, KC_7, KC_8, KC_9, KC_0,
+        KC_F11, KC_F7, KC_F8, KC_F9, KC_F10,
+        LCTL(KC_6), LCTL(KC_7), LCTL(KC_8), LCTL(KC_9), LCTL(KC_0),
+                                            KC_NO, KC_NO, KC_NO),
+
+	[UTILITY] = LAYOUT(
         LT(SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_B,
         KC_TAB, KC_A, KC_S, KC_D, KC_I,
         KC_Z,   KC_C, KC_O, KC_M, KC_P,
         LT(SKILL_3,KC_SPC), LT(SKILL_2,KC_SPC), LT(SKILL_1,KC_SPC)),
 
-	[SKILL_1] = LAYOUT(
-        KC_1, KC_Q, KC_W, KC_E, KC_4,
-        KC_2, KC_A, KC_S, KC_D, KC_5,
-        KC_3, KC_7, KC_8, KC_9, KC_6,
-              KC_NO, KC_NO, KC_NO),
-
-	[SKILL_2] = LAYOUT(
-        KC_F1, KC_Q, KC_W, KC_E, KC_F4,
-        KC_F2, KC_A, KC_S, KC_D, KC_F5,
-        KC_F3, KC_F7, KC_F8, KC_F9, KC_F6,
-                    KC_NO, KC_NO, KC_NO),
-
-	[SKILL_3] = LAYOUT(
-        LCTL(KC_1), KC_Q, KC_W, KC_E, LCTL(KC_4),
-        LCTL(KC_2), KC_A, KC_S, KC_D, LCTL(KC_5),
-        LCTL(KC_3), LCTL(KC_7), LCTL(KC_8), LCTL(KC_9), LCTL(KC_6),
-                                            KC_NO, KC_NO, KC_NO),
 	[SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
@@ -139,6 +147,9 @@ void oled_task_user(void) {
             break;
         case SKILL_3:
             oled_write_P(PSTR("SKILL_3\n"), false);
+            break;
+        case UTILITY:
+            oled_write_P(PSTR("UTILITY\n"), false);
             break;
         case SETTING:
             oled_write_P(PSTR("SETTING\n"), false);
