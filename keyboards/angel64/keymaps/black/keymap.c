@@ -13,7 +13,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#define USE_LED_RIPPLE_EFFECT
+// #define RANDOM_RIPPLE_EFFECT
+
 #include QMK_KEYBOARD_H
+#include "lufa.h"
+
+#ifdef USE_LED_RIPPLE_EFFECT
+struct keybuf {
+  char col, row;
+  char frame;
+};
+struct keybuf keybufs[256];
+unsigned char keybuf_begin, keybuf_end;
+
+unsigned char r = 0;
+unsigned char g = 112;
+unsigned char b = 255;
+int col, row;
+#endif
+
 
 enum layers{
     BASE = 0,
@@ -21,8 +40,8 @@ enum layers{
 };
 
 #define KC_COMMAND_NUM    LT(COMMAND,KC_F13)
-#define KC_COMMAND_KANA    LT(COMMAND,KC_F14)
-#define KC_COMMAND    LT(COMMAND,KC_SPC)
+#define KC_COMMAND_KANA   LT(COMMAND,KC_F14)
+#define KC_COMMAND        LT(COMMAND,KC_SPC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [BASE] = LAYOUT(
@@ -39,15 +58,118 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_NO,  KC_NO, _______, KC_NO, RGB_MOD, KC_NO,  _______, KC_NO,  _______, KC_NO),
 };
 
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef USE_LED_RIPPLE_EFFECT
+    col = record->event.key.col;
+    row = record->event.key.row;
+    if (record->event.pressed) {
+      int end = keybuf_end;
+      keybufs[end].col = col;
+      keybufs[end].row = row;
+      keybufs[end].frame = 0;
+      keybuf_end ++;
+    }
+#endif
   return true;
 }
 
 void matrix_init_user(void) {
+#ifdef USE_LED_RIPPLE_EFFECT
+    rgblight_enable_noeeprom();
+    rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+#endif
 }
 
-void matrix_scan_user(void) {
+#ifdef USE_LED_RIPPLE_EFFECT
+int scan_count = -10;
+int keys[] = { 14, 14, 13, 12, 11 };
+int keys_sum[] = { 0, 14, 28, 41, 53 };
+unsigned char rgb[14][5][3];
+int row_max = 12;
+int ToIndex(char _col, char _row) {
+    return (_col * row_max) + _row;
+}
 
+void led_ripple_effect(void){
+    if (scan_count == -1) {
+      rgblight_enable_noeeprom();
+      rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+    } else if (scan_count >= 0 && scan_count < 5) {
+      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
+        int i = c;
+        // FIXME:
+
+        int index = ToIndex(keybufs[i].col,keybufs[i].row);
+        int coll = 0;
+        for(int s = 4; s >= 0; --s){
+            if( index >= keys_sum[s]){
+                coll = s;
+                break;
+            }
+        }
+        int roww = MAX(0,index - keys_sum[coll]);
+
+        int y = scan_count;
+        int dist_y = abs(y - coll);
+        for (int x=0; x<keys[y]; x++) {
+          int dist = abs(x - roww) + dist_y;
+          if (dist <= keybufs[i].frame) {
+            int elevation = MAX(0, (8 + dist - keybufs[i].frame)) << 2;
+            if (elevation) {
+              if ((rgb[x][y][0] != 255) && r) { rgb[x][y][0] = MIN(255, elevation + rgb[x][y][0]); }
+              if ((rgb[x][y][1] != 255) && g) { rgb[x][y][1] = MIN(255, elevation + rgb[x][y][1]); }
+              if ((rgb[x][y][2] != 255) && b) { rgb[x][y][2] = MIN(255, elevation + rgb[x][y][2]); }
+            }
+          }
+        }
+      }
+    } else if (scan_count == 5) {
+      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
+        int i = c;
+        if (keybufs[i].frame < 64) {
+          keybufs[i].frame ++;
+        } else {
+          keybuf_begin ++;
+        }
+      }
+    } else if (scan_count >= 6 && scan_count <= 10) {
+      int y = scan_count - 6;
+      for (int x=0; x<keys[y]; x++) {
+        int at = keys_sum[y] + x;
+        led[at].r = rgb[x][y][0];
+        led[at].g = rgb[x][y][1];
+        led[at].b = rgb[x][y][2];
+      }
+      rgblight_set();
+    } else if (scan_count == 11) {
+      memset(rgb, 0, sizeof(rgb));
+    }
+    scan_count++;
+    if (scan_count >= 12) { scan_count = 0; }
+}
+
+#endif
+
+void matrix_scan_user(void) {
+#ifdef USE_LED_RIPPLE_EFFECT
+#ifdef RANDOM_RIPPLE_EFFECT
+    static int timer = 0;
+    static int timeout = 300;
+    timer++;
+    if(timer > timeout){
+      int end = keybuf_end;
+      col = rand() % 6;
+      row = rand() % 12;
+      keybufs[end].col = col;
+      keybufs[end].row = row;
+      keybufs[end].frame = 0;
+      keybuf_end ++;
+      timer = rand() % timeout;
+    }
+#endif
+    led_ripple_effect();
+#endif
 }
 
 void led_set_user(uint8_t usb_led) {
