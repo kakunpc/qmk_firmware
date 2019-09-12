@@ -111,7 +111,8 @@ struct keybuf {
   char col, row;
   char frame;
 };
-struct keybuf keybufs[256];
+#define LED_KEY_BUFF 16
+struct keybuf keybufs[LED_KEY_BUFF];
 unsigned char keybuf_begin, keybuf_end;
 
 unsigned char r = 0;
@@ -144,7 +145,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
       keybufs[end].col = col;
       keybufs[end].row = row;
       keybufs[end].frame = 0;
-      keybuf_end ++;
+      keybuf_end = (keybuf_end + 1) % LED_KEY_BUFF;
     }
 #endif
   char str[16];
@@ -250,8 +251,11 @@ void led_ripple_effect(void){
     if (scan_count == -1) {
       rgblight_enable_noeeprom();
       rgblight_mode(0);
-    } else if (scan_count >= 0 && scan_count < 5) {
-      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
+    } else if (scan_count == 0) {
+      // Create lipple effect
+      memset(rgb, 0, sizeof(rgb));
+
+      for (unsigned char c=keybuf_begin; c!=keybuf_end;  c=(c+1)%LED_KEY_BUFF ) {
         int i = c;
         // FIXME:
 
@@ -265,46 +269,58 @@ void led_ripple_effect(void){
         }
         int roww = MAX(0,index - keys_sum[coll]);
 
-        int y = scan_count;
-        int dist_y = abs(y - coll);
-        for (int x=0; x<keys[y]; x++) {
-          int dist = abs(x - roww) + dist_y;
-          if (dist <= keybufs[i].frame) {
-            int elevation = MAX(0, (8 + dist - keybufs[i].frame)) << 2;
-            if (elevation) {
-              if ((rgb[x][y][0] != 255) && r) { rgb[x][y][0] = MIN(255, elevation + rgb[x][y][0]); }
-              if ((rgb[x][y][1] != 255) && g) { rgb[x][y][1] = MIN(255, elevation + rgb[x][y][1]); }
-              if ((rgb[x][y][2] != 255) && b) { rgb[x][y][2] = MIN(255, elevation + rgb[x][y][2]); }
+
+        for (int y = 0; y < 5; y++){
+          int dist_y = abs(y - coll);
+          for (int x=0; x<keys[y]; x++) {
+            int dist = abs(x - roww) + dist_y;
+            if (dist <= keybufs[i].frame) {
+              int elevation = MAX(0, (8 + dist - keybufs[i].frame)) << 2;
+              if (elevation) {
+                if ((rgb[x][y][0] != 255) && r) { rgb[x][y][0] = MIN(255, elevation + rgb[x][y][0]); }
+                if ((rgb[x][y][1] != 255) && g) { rgb[x][y][1] = MIN(255, elevation + rgb[x][y][1]); }
+                if ((rgb[x][y][2] != 255) && b) { rgb[x][y][2] = MIN(255, elevation + rgb[x][y][2]); }
+              }
             }
           }
         }
-      }
-    } else if (scan_count == 5) {
-      for (unsigned char c=keybuf_begin; c!=keybuf_end; c++) {
-        int i = c;
         if (keybufs[i].frame < 64) {
           keybufs[i].frame ++;
         } else {
-          keybuf_begin ++;
+          keybuf_begin = (keybuf_begin + 1) % LED_KEY_BUFF;
         }
       }
-    } else if (scan_count >= 6 && scan_count <= 10) {
-      int y = scan_count - 6;
-      for (int x=0; x<keys[y]; x++) {
-        int at = keys_sum[y] + x;
-        led[at].r = rgb[x][y][0];
-        led[at].g = rgb[x][y][1];
-        led[at].b = rgb[x][y][2];
+    } else if (scan_count == 1) {
+      // Update LEDs.
+      for (int y=0; y<5; y++) {
+        for (int x=0; x<keys[y]; x++) {
+          int at = keys_sum[y] + x ;
+          led[at].r = rgb[x][y][0];
+          led[at].g = rgb[x][y][1];
+          led[at].b = rgb[x][y][2];
+        }
       }
       rgblight_set();
-    } else if (scan_count == 11) {
-      memset(rgb, 0, sizeof(rgb));
     }
     scan_count++;
-    if (scan_count >= 12) { scan_count = 0; }
+    if (scan_count >= 2) { scan_count = 0; }
 }
 
 #endif
+
+void matrix_init_user() {
+//  rgblight_mode_noeeprom(35);
+//  set_usb_enabled(true);
+  //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
+  #ifdef SSD1306OLED
+      iota_gfx_init(!IS_LEFT_HAND);   // turns on the display
+  #endif
+
+#ifdef USE_LED_RIPPLE_EFFECT
+    rgblight_enable_noeeprom();
+    rgblight_mode(0);
+#endif
+}
 
 //runs every scan cycle (a lot)
 void matrix_scan_user(void) {
@@ -334,7 +350,6 @@ void matrix_scan_user(void) {
 
 //SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
 #ifdef SSD1306OLED
-
 void matrix_update(struct CharacterMatrix *dest,
                           const struct CharacterMatrix *source) {
   if (memcmp(dest->display, source->display, sizeof(dest->display))) {
@@ -343,92 +358,56 @@ void matrix_update(struct CharacterMatrix *dest,
   }
 }
 
-// Render to OLED
+/*
+static void render_logo(struct CharacterMatrix *matrix) {
+
+  static char logo[]={
+    0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
+    0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
+    0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,
+    0};
+  matrix_write(matrix, logo);
+  //matrix_write_P(&matrix, PSTR(" Split keyboard kit"));
+}
+*/
+
+
 void render_status(struct CharacterMatrix *matrix) {
 
-  // froggy logo
-  static char logo[4][1][17]=
-  {
-    {
-      {0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,0x70,0x71,0x72,0x73,0x74,0}
-    },
-    {
-      {0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,0}
-    },
-    {
-      {0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,0}
-    },
-    {
-      {0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0}
-    }
-  };
+  // Render to mode icon
+  static char logo[][2][3]={{{0x95,0x96,0},{0xb5,0xb6,0}},{{0x97,0x98,0},{0xb7,0xb8,0}}};
+  if(keymap_config.swap_lalt_lgui==false){
+    matrix_write(matrix, logo[0][0]);
+    matrix_write_P(matrix, PSTR("\n"));
+    matrix_write(matrix, logo[0][1]);
+  }else{
+    matrix_write(matrix, logo[1][0]);
+    matrix_write_P(matrix, PSTR("\n"));
+    matrix_write(matrix, logo[1][1]);
+  }
 
-  static char indctr[8][2][4]=
-  {
-    // white icon
-    {
-      {0x60,0x61,0x62,0},
-      {0x63,0x64,0}
-    },
-    {
-      {0x80,0x81,0x82,0},
-      {0x83,0x84,0}
-    },
-    {
-      {0xa0,0xa1,0xa2,0},
-      {0xa3,0xa4,0}
-    },
-    {
-      {0xc0,0xc1,0xc2,0},
-      {0xc3,0xc4,0}
-    },
-    // Black icon
-    {
-      {0x75,0x76,0x77,0},
-      {0x78,0x79,0}
-    },
-    {
-      {0x95,0x96,0x97,0},
-      {0x98,0x99,0}
-    },
-    {
-      {0xb5,0xb6,0xb7,0},
-      {0xb8,0xb9,0}
-    },
-    {
-      {0xd5,0xd6,0xd7,0},
-      {0xd8,0xd9,0}
-    },
-  };
+  matrix_write_P(matrix, PSTR("\nLayer: "));
+  matrix_write_P(matrix, PSTR("Default\n"));
 
-  int rown = 0;
-  int rowf = 0;
-  int rowa = 0;
-  int rows = 0;
 
-  //Set Indicator icon
-  if (host_keyboard_leds() & (1<<USB_LED_NUM_LOCK)) { rown = 4; } else { rown = 0; }
-  if (host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK)) { rowa = 4; } else { rowa = 0; }
-  if (host_keyboard_leds() & (1<<USB_LED_SCROLL_LOCK)) { rows = 4; } else { rows = 0; }
+  char buf[40];
+  snprintf(buf,sizeof(buf), "col:%d row:%d", col, row);
+  matrix_write(matrix, buf);
+  matrix_write_P(matrix, PSTR("\n"));
 
-  matrix_write(matrix, indctr[rown]  [0]);
-  matrix_write(matrix, indctr[rowf]  [1]);
-  matrix_write(matrix, logo  [0]     [0]);
-  matrix_write(matrix, indctr[rown+1][0]);
-  matrix_write(matrix, indctr[rowf+1][1]);
-  matrix_write(matrix, logo  [1]     [0]);
-  matrix_write(matrix, indctr[rowa+2][0]);
-  matrix_write(matrix, indctr[rows+2][1]);
-  matrix_write(matrix, logo  [2]     [0]);
-  matrix_write(matrix, indctr[rowa+3][0]);
-  matrix_write(matrix, indctr[rows+3][1]);
-  matrix_write(matrix, logo  [3]     [0]);
-
+  // Host Keyboard LED Status
+  char led[40];
+    snprintf(led, sizeof(led), "\n%s  %s  %s",
+            (host_keyboard_leds() & (1<<USB_LED_NUM_LOCK)) ? "NUMLOCK" : "       ",
+            (host_keyboard_leds() & (1<<USB_LED_CAPS_LOCK)) ? "CAPS" : "    ",
+            (host_keyboard_leds() & (1<<USB_LED_SCROLL_LOCK)) ? "SCLK" : "    ");
+  matrix_write(matrix, led);
 }
 
-#if 1
+
 void iota_gfx_task_user(void) {
   struct CharacterMatrix matrix;
+
 #if DEBUG_TO_SCREEN
   if (debug_enable) {
     return;
@@ -436,8 +415,11 @@ void iota_gfx_task_user(void) {
 #endif
 
   matrix_clear(&matrix);
-  render_status(&matrix);
+  //if(is_master){
+    render_status(&matrix);
+  //}else{
+  //  render_logo(&matrix);
+  //}
   matrix_update(&display, &matrix);
 }
-#endif
 #endif

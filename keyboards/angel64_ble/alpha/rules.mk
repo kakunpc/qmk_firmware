@@ -1,5 +1,5 @@
 
-RGBLIGHT_ENABLE = yes
+RGBLIGHT_ENABLE = no
 LED_BACK_ENABLE = yes        # LED backlight (Enable WS2812 RGB underlight.)
 LED_ANIMATIONS = yes        # LED animations
 OLED_ENABLE = yes            # OLED_ENABLE
