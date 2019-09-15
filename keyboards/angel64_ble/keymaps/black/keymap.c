@@ -308,7 +308,7 @@ void led_ripple_effect(void){
 
 #endif
 
-void matrix_init_user() {
+void matrix_init_user_for_keymap() {
 //  rgblight_mode_noeeprom(35);
 //  set_usb_enabled(true);
   //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h

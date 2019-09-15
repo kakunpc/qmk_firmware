@@ -12,7 +12,7 @@ MCU_SERIES = NRF52840
 NRFSDK_ROOT := $(NRFSDK15_ROOT) #Path to nRF SDK v15.0.0
 
 # project specific files
-# SRC =	alpha/matrix.c
+SRC +=	alpha/matrix.c
 SRC += ssd1306.c
 
 # NRF_SEPARATE = master

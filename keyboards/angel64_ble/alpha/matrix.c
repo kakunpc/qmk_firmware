@@ -149,6 +149,10 @@ void matrix_init(void) {
 }
 */
 
+__attribute__ ((weak))
+void matrix_init_user_for_keymap(void) {
+}
+
 void matrix_init_user(){
   // initialize row and col
   init_rows();
@@ -173,8 +177,8 @@ void matrix_init_user(){
   i2cs_init();
 #endif
 
-  set_usb_enabled(true);
-
+  // set_usb_enabled(true);
+  matrix_init_user_for_keymap();
 }
 
 
