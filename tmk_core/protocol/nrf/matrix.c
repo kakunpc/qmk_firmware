@@ -105,16 +105,19 @@ static ble_switch_state_t front_queue(switch_queue *q){
 
 static void init_rows(void);
 static void init_cols(void);
+#if DIODE_DIRECTION == ROW2COL
 void scan_row2col_matrix(void);
 matrix_row_t get_row2col_matrix(uint8_t row);
 void unselect_cols(void);
 void select_col(uint8_t col);
 matrix_col_t read_rows(void);
 matrix_col_t read_col(uint8_t col);
+#else
 void unselect_rows(void);
 void select_row(uint8_t row);
 matrix_row_t read_cols(void);
 matrix_row_t read_row(uint8_t row);
+#endif
 
 __attribute__ ((weak))
 void matrix_init_user(void) {
@@ -155,9 +158,12 @@ void radio_event_callback(bool active){
 void matrix_init(void) {
   // initialize row and col
   init_rows();
-  init_cols();
+#if DIODE_DIRECTION == ROW2COL
   unselect_cols();
+#else
   unselect_rows();
+#endif
+  init_cols();
 //    NRF_LOG_INFO("matrix init\r\n")
 
 // initialize matrix state: all keys off
@@ -197,49 +203,7 @@ uint8_t matrix_scan_impl(matrix_row_t* _matrix){
   volatile int matrix_changed = 0;
   ble_switch_state_t ble_switch_send[THIS_DEVICE_ROWS*THIS_DEVICE_COLS];
 
-  matrix_offset = 0;
-  init_rows();
-  for (uint8_t i = 0; i < THIS_DEVICE_ROWS; i++) {
-    matrix_row_t row = read_row(i);
-    if (matrix_debouncing[i + matrix_offset] != row) {
-      matrix_debouncing[i + matrix_offset] = row;
-      debouncing = DEBOUNCE;
-    }
-  }
-
-
-  if (debouncing) {
-    if (--debouncing) {
-//            wait_ms(1);
-    } else {
-      for (uint8_t i = 0; i < THIS_DEVICE_ROWS; i++) {
-        if (matrix_dummy[i + matrix_offset] != matrix_debouncing[i + matrix_offset]) {
-          for (uint8_t j = 0; j < THIS_DEVICE_COLS; j++) {
-            if ((matrix_dummy[i + matrix_offset]
-                ^ matrix_debouncing[i + matrix_offset]) & (1 << j)) {
-              ble_switch_send[0].dat[0]=0xff;
-              ble_switch_send[0].dat[1]=((int)sync) % 0xff; // synchronizing packet
-              ble_switch_send[matrix_changed+1].timing = timing;
-              ble_switch_send[matrix_changed+1].state = (matrix_debouncing[i
-                  + matrix_offset] >> j) & 1;
-              ble_switch_send[matrix_changed+1].id = i * MATRIX_COLS + j;
-              matrix_changed++;
-            }
-          }
-        }
-#if defined(NRF_SEPARATE_KEYBOARD_MASTER) || defined(NRF_SEPARATE_KEYBOARD_SLAVE)
-        matrix_dummy[i + matrix_offset] = matrix_debouncing[i + matrix_offset];
-//        matrix[i + matrix_offset] = matrix_debouncing[i + matrix_offset]; Do not set matrix directory
-#else
-        matrix_dummy[i + matrix_offset] = matrix_debouncing[i + matrix_offset];
-        matrix[i + matrix_offset] = matrix_debouncing[i + matrix_offset];
-#endif
-      }
-    }
-  }
-
-  matrix_offset = MATRIX_ROWS / 2;
-  init_cols();
+#if DIODE_DIRECTION == ROW2COL
   scan_row2col_matrix();
   for (uint8_t i = 0; i < THIS_DEVICE_ROWS; i++) {
     matrix_row_t row = get_row2col_matrix(i);
@@ -248,6 +212,15 @@ uint8_t matrix_scan_impl(matrix_row_t* _matrix){
       debouncing = DEBOUNCE;
     }
   }
+#else
+  for (uint8_t i = 0; i < THIS_DEVICE_ROWS; i++) {
+    matrix_row_t row = read_row(i);
+    if (matrix_debouncing[i + matrix_offset] != row) {
+      matrix_debouncing[i + matrix_offset] = row;
+      debouncing = DEBOUNCE;
+    }
+  }
+#endif
 
   if (debouncing) {
     if (--debouncing) {
@@ -460,9 +433,11 @@ void matrix_print(void)
 }
 
 static void init_rows() {
-  for(int i=0; i<THIS_DEVICE_COLS; i++) {
-    nrf_gpio_cfg_input(col_pins[i], NRF_GPIO_PIN_PULLUP);
+#if DIODE_DIRECTION == ROW2COL
+  for(int i=0; i<THIS_DEVICE_ROWS; i++) {
+    nrf_gpio_cfg_input(row_pins[i], NRF_GPIO_PIN_PULLUP);
   }
+#else
   for(int i=0; i<THIS_DEVICE_ROWS; i++) {
     nrf_gpio_cfg(row_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
@@ -471,14 +446,13 @@ static void init_rows() {
         NRF_GPIO_PIN_S0D1,
         NRF_GPIO_PIN_NOSENSE);
   }
+#endif
 }
 /* Column pin configuration
  */
 static void  init_cols(void)
 {
-  for(int i=0; i<THIS_DEVICE_ROWS; i++) {
-    nrf_gpio_cfg_input(row_pins[i], NRF_GPIO_PIN_PULLUP);
-  }
+#if DIODE_DIRECTION == ROW2COL
   for(int i=0; i<THIS_DEVICE_COLS; i++) {
     nrf_gpio_cfg(col_pins[i],
         NRF_GPIO_PIN_DIR_OUTPUT,
@@ -487,7 +461,13 @@ static void  init_cols(void)
         NRF_GPIO_PIN_S0D1,
         NRF_GPIO_PIN_NOSENSE);
   }
+#else
+  for(int i=0; i<THIS_DEVICE_COLS; i++) {
+    nrf_gpio_cfg_input(col_pins[i], NRF_GPIO_PIN_PULLUP);
+  }
+#endif
 }
+#if DIODE_DIRECTION == ROW2COL
 matrix_row_t matrix_row2col[MATRIX_ROWS];
 void scan_row2col_matrix(void)
 {
@@ -539,6 +519,7 @@ void select_col(uint8_t col)
 {
     nrf_gpio_pin_clear(col_pins[col]);
 }
+#else
 
 /* Returns status of switches(1:on, 0:off) */
 matrix_row_t read_cols(void)
@@ -577,6 +558,7 @@ void select_row(uint8_t row)
 {
     nrf_gpio_pin_clear(row_pins[row]);
 }
+#endif
 
 void ble_nus_on_disconnect() {
 #if defined(NRF_SEPARATE_KEYBOARD_MASTER) || defined(NRF_SEPARATE_KEYBOARD_SLAVE)
