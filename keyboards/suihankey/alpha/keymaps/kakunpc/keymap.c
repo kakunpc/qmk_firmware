@@ -36,19 +36,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[BASE] = LAYOUT(
         KC_1, KC_2, KC_3, KC_4, KC_5,
         KC_MINUS, KC_Q, KC_W, KC_E, KC_QUOTE,
-        KC_NO, KC_A, KC_S, KC_D, LT(UTILITY,KC_SPC),
+        KC_LSFT, KC_A, KC_S, KC_D, LT(UTILITY,KC_SPC),
         LT(SKILL_3,KC_SPC), LT(SKILL_2,KC_SPC), LT(SKILL_1,KC_SPC)),
 
 	[SKILL_1] = LAYOUT(
         KC_F1, KC_F2, KC_F3, KC_F4, KC_F5,
         KC_F11, KC_Q, KC_W, KC_E, KC_F12,
-        KC_NO, KC_A, KC_S, KC_D, KC_NO,
+        KC_LSFT, KC_A, KC_S, KC_D, KC_NO,
               KC_NO, KC_NO, KC_NO),
 
 	[SKILL_2] = LAYOUT(
         LCTL(KC_1), LCTL(KC_2), LCTL(KC_3), LCTL(KC_4), LCTL(KC_5),
         LCTL(KC_MINUS), KC_Q, KC_W, KC_E, LCTL(KC_QUOTE),
-        KC_NO, KC_A, KC_S, KC_D, KC_NO,
+        KC_LSFT, KC_A, KC_S, KC_D, KC_NO,
                     KC_NO, KC_NO, KC_NO),
 
 	[SKILL_3] = LAYOUT(
