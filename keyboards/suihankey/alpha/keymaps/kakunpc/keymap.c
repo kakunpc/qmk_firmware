@@ -16,89 +16,160 @@
 #include QMK_KEYBOARD_H
 
 enum layers{
-    BASE,
-    SKILL_1,
-    SKILL_2,
-    SKILL_3,
-    UTILITY,
-    SETTING,
-    SATISFACTORY,
-    SATISFACTORY_SETTING,
-    TOHOU,
-    TOHOU_SETTING,
+    _BASE,
+    _SKILL_1,
+    _SKILL_2,
+    _SKILL_3,
+    _UTILITY,
+    _SETTING,
+    _SATISFACTORY,
+    _SATISFACTORY_SETTING,
+    _TOHOU,
+    _TOHOU_SETTING,
+    _MINECRAFT,
+    _MINECRAFT_SETTING,
+    _OW,
+    _OW_SETTING,
 };
 
 enum my_keycodes {
-  LOGO_TOG = SAFE_RANGE
+  LOGO_TOG = SAFE_RANGE,
+  DF_BASE,
+  DF_SATISFACTORY,
+  DF_TOHOU,
+  DF_MINECRAFT,
+  DF_OW
 };
 
+uint16_t default_layer = 0;
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-	[BASE] = LAYOUT(
+	[_BASE] = LAYOUT(
         KC_1, KC_2, KC_3, KC_4, KC_5,
         KC_MINUS, KC_Q, KC_W, KC_E, KC_QUOTE,
-        KC_LSFT, KC_A, KC_S, KC_D, LT(UTILITY,KC_SPC),
-        LT(SKILL_3,KC_SPC), LT(SKILL_2,KC_SPC), LT(SKILL_1,KC_SPC)),
+        KC_LSFT, KC_A, KC_S, KC_D, LT(_UTILITY,KC_SPC),
+        LT(_SKILL_3,KC_SPC), LT(_SKILL_2,KC_SPC), LT(_SKILL_1,KC_SPC)),
 
-	[SKILL_1] = LAYOUT(
+	[_SKILL_1] = LAYOUT(
         KC_F1, KC_F2, KC_F3, KC_F4, KC_F5,
         KC_F11, KC_Q, KC_W, KC_E, KC_F12,
         KC_LSFT, KC_A, KC_S, KC_D, KC_NO,
               KC_NO, KC_NO, KC_NO),
 
-	[SKILL_2] = LAYOUT(
+	[_SKILL_2] = LAYOUT(
         LCTL(KC_1), LCTL(KC_2), LCTL(KC_3), LCTL(KC_4), LCTL(KC_5),
         LCTL(KC_MINUS), KC_Q, KC_W, KC_E, LCTL(KC_QUOTE),
         KC_LSFT, KC_A, KC_S, KC_D, KC_NO,
                     KC_NO, KC_NO, KC_NO),
 
-	[SKILL_3] = LAYOUT(
+	[_SKILL_3] = LAYOUT(
         KC_6, KC_7, KC_8, KC_9, KC_0,
         KC_F11, KC_F7, KC_F8, KC_F9, KC_F10,
         LCTL(KC_6), LCTL(KC_7), LCTL(KC_8), LCTL(KC_9), LCTL(KC_0),
                                             KC_NO, KC_NO, KC_NO),
 
-	[UTILITY] = LAYOUT(
-        LT(SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_B,
+	[_UTILITY] = LAYOUT(
+        LT(_SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_B,
         KC_TAB, KC_A, KC_S, KC_D, KC_I,
         KC_Z,   KC_C, KC_O, KC_M, KC_P,
-        LT(SKILL_3,KC_SPC), LT(SKILL_2,KC_SPC), LT(SKILL_1,KC_SPC)),
+        LT(_SKILL_3,KC_SPC), LT(_SKILL_2,KC_SPC), LT(_SKILL_1,KC_SPC)),
 
-	[SETTING] = LAYOUT(
+	[_SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
-        DF(SATISFACTORY), DF(TOHOU), KC_NO, KC_NO, LOGO_TOG,
+        DF_SATISFACTORY, DF_TOHOU, DF_MINECRAFT, DF_OW, LOGO_TOG,
               RGB_MOD, RGB_RMOD, RGB_TOG),
 
-	[SATISFACTORY] = LAYOUT(
-        LT(SATISFACTORY_SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_R,
+	[_SATISFACTORY] = LAYOUT(
+        LT(_SATISFACTORY_SETTING,KC_ESC), KC_Q, KC_W, KC_E, KC_R,
         KC_TAB, KC_A, KC_S, KC_D, KC_F,
         KC_LSFT,   KC_Z, KC_X, KC_C, KC_V,
                   KC_T, KC_SPC, KC_SPC),
-	[SATISFACTORY_SETTING] = LAYOUT(
+	[_SATISFACTORY_SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
-        DF(BASE), KC_NO, KC_NO, KC_NO, LOGO_TOG,
+        DF_BASE, KC_NO, KC_NO, KC_NO, LOGO_TOG,
               RGB_MOD, RGB_RMOD, RGB_TOG),
 
-	[TOHOU] = LAYOUT(
-        LT(TOHOU_SETTING,KC_ESC), KC_NO, KC_UP, KC_NO, KC_NO,
+	[_TOHOU] = LAYOUT(
+        LT(_TOHOU_SETTING,KC_ESC), KC_NO, KC_UP, KC_NO, KC_NO,
         KC_LSFT, KC_LEFT, KC_DOWN, KC_RIGHT, KC_NO,
         KC_Z,   KC_NO, KC_NO, KC_NO, KC_NO,
                   KC_C, KC_X, KC_LSFT ),
-	[TOHOU_SETTING] = LAYOUT(
+	[_TOHOU_SETTING] = LAYOUT(
         KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
         KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
-        DF(BASE), KC_NO, KC_NO, KC_NO, LOGO_TOG,
+        DF_BASE, KC_NO, KC_NO, KC_NO, LOGO_TOG,
+              RGB_MOD, RGB_RMOD, RGB_TOG),
+
+
+	[_MINECRAFT] = LAYOUT(
+        KC_ESC, KC_1, KC_2, KC_3, KC_4,
+        KC_TAB, KC_Q, KC_W, KC_E, KC_R,
+        KC_LSFT, KC_A, KC_S, KC_D, KC_F,
+                   LT(_MINECRAFT_SETTING,KC_ESC), KC_SPC, KC_SPC),
+
+	[_MINECRAFT_SETTING] = LAYOUT(
+        KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
+        KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
+        DF_BASE, KC_NO, KC_NO, KC_NO, LOGO_TOG,
+              RGB_MOD, RGB_RMOD, RGB_TOG),
+
+
+	[_OW] = LAYOUT(
+        KC_ESC, KC_1, KC_2, KC_3, KC_4,
+        KC_TAB, KC_Q, KC_W, KC_E, KC_R,
+        KC_LSFT, KC_A, KC_S, KC_D, KC_F,
+                   LT(_OW_SETTING,KC_H), KC_C, KC_SPC),
+
+	[_OW_SETTING] = LAYOUT(
+        KC_NO, RGB_HUI, RGB_SAI, RGB_VAI, KC_NO,
+        KC_NO, RGB_HUD, RGB_SAD, RGB_VAD, KC_NO,
+        DF_BASE, KC_NO, KC_NO, KC_NO, LOGO_TOG,
               RGB_MOD, RGB_RMOD, RGB_TOG),
 };
 
 bool useLogo = false;
+
+void persistent_default_layer_set(uint16_t value) {
+    // eeconfig_update_default_layer(default_layer);
+    default_layer_set(1UL << value);
+    default_layer = value;
+    // eeconfig_update_rgblight(rgblight_config.raw);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case LOGO_TOG:
         if (record->event.pressed) {
             useLogo = !useLogo;
+            }
+            return false;
+
+  case DF_BASE:
+        if (record->event.pressed) {
+        persistent_default_layer_set(_BASE);
+            }
+            return false;
+  case DF_SATISFACTORY:
+        if (record->event.pressed) {
+        persistent_default_layer_set(_SATISFACTORY);
+            }
+            return false;
+  case DF_TOHOU:
+        if (record->event.pressed) {
+        persistent_default_layer_set(_TOHOU);
+            }
+            return false;
+  case DF_MINECRAFT:
+        if (record->event.pressed) {
+        persistent_default_layer_set(_MINECRAFT);
+            }
+            return false;
+
+        case DF_OW:
+        if (record->event.pressed) {
+        persistent_default_layer_set(_OW);
             }
             return false;
 
@@ -136,34 +207,45 @@ void oled_task_user(void) {
 
     oled_write_P(PSTR("Layer: "), false);
     switch (biton32(layer_state)) {
-        case BASE:
-            oled_write_P(PSTR("Default\n"), false);
+        case _BASE:
+            switch (default_layer)
+            {
+            case _SATISFACTORY:
+                oled_write_P(PSTR("SATISFACTORY\n"), false);
+                break;
+            case _TOHOU:
+                oled_write_P(PSTR("TOHOU\n"), false);
+                break;
+            case _MINECRAFT:
+                oled_write_P(PSTR("MINECRAFT\n"), false);
+                break;
+            case _OW:
+                oled_write_P(PSTR("OVERWATCH\n"), false);
+                break;
+            default:
+                oled_write_P(PSTR("Default\n"), false);
+                break;
+            }
             break;
-        case SKILL_1:
+        case _SKILL_1:
             oled_write_P(PSTR("SKILL_1\n"), false);
             break;
-        case SKILL_2:
+        case _SKILL_2:
             oled_write_P(PSTR("SKILL_2\n"), false);
             break;
-        case SKILL_3:
+        case _SKILL_3:
             oled_write_P(PSTR("SKILL_3\n"), false);
             break;
-        case UTILITY:
+        case _UTILITY:
             oled_write_P(PSTR("UTILITY\n"), false);
             break;
-        case SETTING:
+        case _SETTING:
             oled_write_P(PSTR("SETTING\n"), false);
             break;
-        case SATISFACTORY:
-            oled_write_P(PSTR("SATISFACTORY\n"), false);
-            break;
-        case SATISFACTORY_SETTING:
+        case _SATISFACTORY_SETTING:
             oled_write_P(PSTR("SATIS_SETTING\n"), false);
             break;
-        case TOHOU:
-            oled_write_P(PSTR("TOHOU\n"), false);
-            break;
-        case TOHOU_SETTING:
+        case _TOHOU_SETTING:
             oled_write_P(PSTR("TOHOU_SETTING\n"), false);
             break;
         default:
