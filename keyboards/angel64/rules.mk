@@ -35,3 +35,5 @@ CUSTOM_MATRIX = yes
 # OLED_DRIVER_ENABLE = yes
 
 SRC += matrix.c
+
+DEFAULT_FOLDER = angel64/rev1
