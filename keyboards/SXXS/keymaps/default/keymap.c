@@ -40,7 +40,36 @@ void encoder_update_user(uint8_t index, bool clockwise) {
   }
 }
 
+int ledIds[] = {1,2,3,4,5,6,0};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    int col = record->event.key.col;
+    int row = record->event.key.row;
+    int index =  ledIds[col + (row * 4)];
+    if (record->event.pressed) {
+        sethsv(HSV_WHITE, (LED_TYPE *)&led[index]);
+    }
+    else{
+        setrgb(0,0,0 , (LED_TYPE *)&led[index]);
+    }
+    rgblight_set();
+
+    return true;
+}
+
+
 void keyboard_post_init_user(void) {
   // Customise these values to desired behaviour
   // debug_enable=true;
+  // Call the post init code.
+  rgblight_enable_noeeprom(); // enables Rgb, without saving settings
+  rgblight_sethsv_noeeprom(180, 255, 255); // sets the color to teal/cyan without saving
+  for(int i = 0; i < 7;++i){
+    int id = ledIds[i];
+    setrgb(0,0,0 , (LED_TYPE *)&led[id]);
+  }
+  // setrgb(150,150,150, (LED_TYPE *)&led[7]);
+  // setrgb(150,150,150, (LED_TYPE *)&led[8]);
+  rgblight_set();
+  //rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3); // sets mode to Fast breathing without saving
 }
