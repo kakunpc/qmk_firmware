@@ -17,7 +17,7 @@
 #pragma once
 
 // place overrides here
-#define MASTER_RIGHT
+// #define MASTER_RIGHT
 #define RGBLIGHT_SLEEP
 #define RGBLIGHT_SPLIT { 8, 8 }
 #define RGBLIGHT_ANIMATIONS
