@@ -1,1 +1,1 @@
-# The default keymap for SXXS
+# The default keymap for sxxs
