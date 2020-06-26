@@ -15,6 +15,10 @@
  */
 #include QMK_KEYBOARD_H
 
+
+#include "paw3204.h"
+#include "pointing_device.h"
+
 enum layers{
     _BASE,
     _FN
@@ -26,7 +30,7 @@ enum layers{
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [_BASE] = LAYOUT(
-        KC_ESC,KC_GRV,KC_1,KC_2,KC_3,KC_4,KC_5,             KC_6,KC_7,KC_8,KC_9,KC_0,KC_MINS,KC_EQL,KC_BSPC,
+        RGB_TOG,RGB_MOD,KC_1,KC_2,KC_3,KC_4,KC_5,             RGB_TOG,RGB_MOD,KC_8,KC_9,KC_0,KC_MINS,KC_EQL,KC_BSPC,
         KC_TAB  ,KC_Q,KC_W,KC_E,KC_R,KC_T,                  KC_Y,KC_U,KC_I,KC_O,KC_P,KC_LBRC,KC_RBRC,KC_BSLS,
         KC_LCTRL ,KC_A,KC_S,KC_D,KC_F,KC_G,                 KC_H,KC_J,KC_K,KC_L,KC_SCLN,KC_QUOT,KC_ENT,
         KC_LSFT   ,KC_Z,KC_X,KC_C,KC_V,KC_B,                KC_N,KC_M,KC_COMM,KC_DOT,KC_SLSH,KC_RSFT,KC_NO,   KC_UP,
@@ -58,16 +62,49 @@ static void render_logo(void) {
 void oled_task_user(void) { render_logo(); }
 #endif
 
-/*
 void matrix_init_user(void) {
+    init_paw3204();
+}
 
+report_mouse_t mouse_rep;
+
+void keyboard_post_init_user() {
+    debug_enable = true;
+    debug_mouse = true;
 }
 
 void matrix_scan_user(void) {
+    static int  cnt;
+    static bool paw_ready;
+    if (cnt++ % 50 == 0) {
+        uint8_t pid = read_pid_paw3204();
+        if (pid == 0x30) {
+            dprint("paw3204 OK\n");
+            paw_ready = true;
+        } else {
+            dprintf("paw3204 NG:%d\n", pid);
+            paw_ready = false;
+        }
+    }
 
+    if (paw_ready) {
+        uint8_t stat;
+        int8_t x, y;
+
+        read_paw3204(&stat, &x, &y);
+        mouse_rep.buttons = 0;
+        mouse_rep.h       = 0;
+        mouse_rep.v       = 0;
+        mouse_rep.x       = x;
+        mouse_rep.y       = y;
+
+        if (cnt % 10 == 0) {
+            dprintf("stat:%3d x:%4d y:%4d\n", stat, mouse_rep.x, mouse_rep.y);
+        }
+
+        if (stat & 0x80) {
+            pointing_device_set_report(mouse_rep);
+        }
+    }
 }
 
-bool led_update_user(led_t led_state) {
-    return true;
-}
-*/
