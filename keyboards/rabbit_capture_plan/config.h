@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "config_common.h"
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID    0xFEED
-#define PRODUCT_ID   0xE751
+/* USB Device descriptor parameter
+   VID & PID are lisenced from microchip sublisence program, Don't use other project! */
+#define VENDOR_ID    0x04D8
+#define PRODUCT_ID   0xEB59
 #define DEVICE_VER   0x0001
 #define MANUFACTURER kakunpc
 #define PRODUCT      rabbit_capture_plan

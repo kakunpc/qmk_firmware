@@ -1,7 +1,7 @@
 {
     "name": "Rapid Capture Plan",
-    "vendorId": "0xFEED",
-    "productId": "0xE751",
+    "vendorId": "0x04D8",
+    "productId": "0xEB59",
     "lighting": "qmk_rgblight",
     "matrix": {
         "rows": 10,
