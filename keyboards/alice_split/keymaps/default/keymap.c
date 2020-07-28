@@ -63,7 +63,9 @@ void oled_task_user(void) { render_logo(); }
 #endif
 
 void matrix_init_user(void) {
+#ifdef POINTING_DEVICE_ENABLE
     init_paw3204();
+#endif
 }
 
 report_mouse_t mouse_rep;
@@ -74,6 +76,7 @@ void keyboard_post_init_user() {
 }
 
 void matrix_scan_user(void) {
+#ifdef POINTING_DEVICE_ENABLE
     static int  cnt;
     static bool paw_ready;
     if (cnt++ % 50 == 0) {
@@ -106,5 +109,6 @@ void matrix_scan_user(void) {
             pointing_device_set_report(mouse_rep);
         }
     }
+#endif
 }
 
