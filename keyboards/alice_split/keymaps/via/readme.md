@@ -1,1 +1,1 @@
-# The default keymap for alice_split
+# The via keymap for alice_split
