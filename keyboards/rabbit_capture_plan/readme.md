@@ -1,12 +1,12 @@
 # rabbit_capture_plan
 
-![rabbit_capture_plan](imgur.com image replace me!)
+![rabbit_capture_plan](https://i.gyazo.com/eb25048b17906f897253e8be18db001c.jpg)
 
-*A short description of the keyboard/project*
+This is 70 keys split keyboard with trackball.
 
-* Keyboard Maintainer: [kakunpc](https://github.com/yourusername)
-* Hardware Supported: *The PCBs, controllers supported*
-* Hardware Availability: *Links to where you can find this hardware*
+* Keyboard Maintainer: [kakunpc](https://github.com/kakunpc)
+* Hardware Supported: rabbit capture plan pcb
+* Hardware Availability: booth([@kakunpc](https://kakunpc.booth.pm/))
 
 Make example for this keyboard (after setting up your build environment):
 
