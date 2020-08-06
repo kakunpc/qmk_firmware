@@ -1,1 +1,1 @@
-DEFAULT_FOLDER = thedogkeyboard/rev1
+DEFAULT_FOLDER = thedogkeyboard/rev2
