@@ -21,6 +21,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_END,
         KC_LCAP, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP,
         KC_LSFT,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT, KC_UP,  KC_PGDN,
-        KC_LCTL, KC_LGUI, KC_LALT,    KC_SPC, KC_ESC,                               KC_RALT, KC_RGUI, KC_APP,  KC_RCTL ,KC_LEFT , KC_DOWN, KC_RIGHT
+        KC_LCTL, KC_LGUI, KC_LALT,           KC_SPC, KC_SPC, KC_SPC,                 KC_RALT, KC_RGUI,  KC_RCTL ,KC_LEFT , KC_DOWN, KC_RIGHT
     )
 };
+
+#ifdef OLED_DRIVER_ENABLE
+void oled_task_user(void) {
+  oled_write_P(PSTR("Angel70 \n"), false);
+  oled_write_P(PSTR("   NUMLCK \n"), IS_HOST_LED_ON(USB_LED_NUM_LOCK));
+  oled_write_P(PSTR("   CAPLCK \n"), IS_HOST_LED_ON(USB_LED_CAPS_LOCK));
+  oled_write_P(PSTR("   SCRLCK "), IS_HOST_LED_ON(USB_LED_SCROLL_LOCK));
+}
+#endif
